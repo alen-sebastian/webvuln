@@ -7,7 +7,7 @@ WebVulnScanner is a Python vulnerability scanner utilizing Nikto.
 ```bash
 git clone https://github.com/alen-sebastian/webvuln.git
 cd webvuln 
-python setup.py install
+sudo python setup.py install
 ```
 
 Or install via pip:
