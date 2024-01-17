@@ -1,42 +1,72 @@
-import multiprocessing as mp 
-import argparse
-import csv
-import re
-from io import StringIO
+#!/usr/bin/env python3
 
-vuln_pattern = re.compile(r'OSVDB-(\d+): (.*)')
+import argparse
+import multiprocessing
+import subprocess
+import os
+import re
+
+import requests
+from bs4 import BeautifulSoup
+
+# Nikto program and database location 
+NIKTO_EXE = "/usr/bin/nikto"
+NIKTO_DB = "/usr/share/nikto/plugins/nikto_db"
 
 def scan_target(target):
-    
-    return subprocess.check_output(["nikto", "-h", target])
+    """Run Nikto scan on target"""
+    output = subprocess.check_output([NIKTO_EXE, "-host", target, "-db", NIKTO_DB])
+    return output.decode()
 
 def parse_results(output):
-     
+    """Extract results from Nikto output"""
+    vulns = []
+    pattern = re.compile(r"OSVDB-(\d+): (.*)")
+    
     for line in output.splitlines():
-        match = vuln_pattern.search(line)
+        match = pattern.match(line)
         if match:
-            yield match.groups()
+            vulns.append(match.groups())
+            
+    return vulns
 
-def print_results(results):
+def get_vuln_details(vuln_id):
+    """Scrape OSVDB website for vulnerability details"""
+    url = f"https://vuldb.com/?{vuln_id}"
     
-    for vuln_id, desc in results:
-        print(f"{vuln_id}: {desc}")
-
-def main():
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        # Extract vulnerability description from page
+        desc = soup.find("div", id="vuln-desc").text 
+        return desc
+        
+    except Exception as e:
+        print(f"Error scraping vulnerability details: {e}")
+        
+def print_results(target, vulns):
+    """Output results to console"""
     
+    print(f"Vulnerabilities found for {target}:")
+    
+    for vuln_id, desc in vulns:
+        # Enhance basic description with scraped details
+        full_desc = desc + " " + get_vuln_details(vuln_id)
+        print(f"{vuln_id}: {full_desc}")
+        
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("target")
     args = parser.parse_args()
+
+    target = args.target
     
+    # Run Nikto scan 
+    output = scan_target(target)
     
-    output = scan_target(args.target) 
-    
-     
-    with mp.Pool() as pool:
-        results = pool.map(parse_results, [output])
-    
-     
-    print_results(results)
-    
-if __name__ == "__main__":
-    main()
+    # Parse output for vulnerabilities
+    vulns = parse_results(output)
+
+    # Print results
+    print_results(target, vulns)
