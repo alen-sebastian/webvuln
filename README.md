@@ -29,7 +29,7 @@ python scanner.py -d example.com -o results.txt
 ## Installation
 
 ```
-git clone https://github.com/user/scanner.git
+git clone https://github.com/user/scanner.git](https://github.com/alen-sebastian/webvuln.git
 pip install -r requirements.txt
 ```
 
