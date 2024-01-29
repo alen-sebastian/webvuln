@@ -1,72 +1,59 @@
-#!/usr/bin/env python3
-
-import argparse
-import multiprocessing
-import subprocess
-import os
-import re
-
 import requests
-from bs4 import BeautifulSoup
+import re
+import argparse
+import os
+import time
+from urllib.parse import unquote
+from tqdm import tqdm
 
-# Nikto program and database location 
-NIKTO_EXE = "/usr/bin/nikto"
-NIKTO_DB = "/usr/share/nikto/plugins/nikto_db"
+cached_archive_resp = None
+compiled_regexes = {}
+payloads = []
 
-def scan_target(target):
-    """Run Nikto scan on target"""
-    output = subprocess.check_output([NIKTO_EXE, "-host", target, "-db", NIKTO_DB])
-    return output.decode()
+def clear():
+  if 'linux' in sys.platform:
+    os.system('clear')
+  elif 'darwin' in sys.platform: 
+    os.system('clear')
+  else:
+    os.system('cls')
 
-def parse_results(output):
-    """Extract results from Nikto output"""
-    vulns = []
-    pattern = re.compile(r"OSVDB-(\d+): (.*)")
-    
-    for line in output.splitlines():
-        match = pattern.match(line)
-        if match:
-            vulns.append(match.groups())
-            
-    return vulns
+def get_archive_urls(domain, subs):
+  global cached_archive_resp
+  if cached_archive_resp is None:
+    url = f"http://web.archive.org/cdx/search/cdx?url=*.{domain}/*&output=txt&fl=original&collapse=urlkey&page=/" if subs else f"http://web.archive.org/cdx/search/cdx?url={domain}/*&output=txt&fl=original&collapse=urlkey&page=/"
+    cached_archive_resp = unquote(requests.get(url).text)
+  return cached_archive_resp
 
-def get_vuln_details(vuln_id):
-    """Scrape OSVDB website for vulnerability details"""
-    url = f"https://vuldb.com/?{vuln_id}"
-    
+def test_payloads(uris):
+  vuln_urls = []
+  with ThreadPoolExecutor(max_workers=10) as executor:
+    futures = [executor.submit(test_uri, uri) for uri in uris]
+    for future in tqdm(as_completed(futures), total=len(futures)):
+      if future.result():
+        vuln_urls.append(future.result())
+  return vuln_urls
+
+def test_uri(uri):
+  for payload in payloads:
+    final_url = f"{uri}{payload}"
     try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.content, "html.parser")
-        
-        # Extract vulnerability description from page
-        desc = soup.find("div", id="vuln-desc").text 
-        return desc
-        
-    except Exception as e:
-        print(f"Error scraping vulnerability details: {e}")
-        
-def print_results(target, vulns):
-    """Output results to console"""
-    
-    print(f"Vulnerabilities found for {target}:")
-    
-    for vuln_id, desc in vulns:
-        # Enhance basic description with scraped details
-        full_desc = desc + " " + get_vuln_details(vuln_id)
-        print(f"{vuln_id}: {full_desc}")
-        
+      req = requests.get(final_url)
+      if 'SQL' in req.text:
+        return final_url
+    except:
+      pass
+  return None
+
+def main():
+  parse_args()
+  clear()
+  archive_resp = get_archive_urls(args.domain, args.subs)
+  urls = extractor.param_extract(archive_resp, 'high', ['woff','js','ttf'], compiled_regexes)
+  with open('payloads.txt', 'r') as f:
+    payloads = f.read().splitlines()
+  vuln_urls = test_payloads(urls)
+  print_results(vuln_urls)
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("target")
-    args = parser.parse_args()
-
-    target = args.target
-    
-    # Run Nikto scan 
-    output = scan_target(target)
-    
-    # Parse output for vulnerabilities
-    vulns = parse_results(output)
-
-    # Print results
-    print_results(target, vulns)
+  main()
