@@ -8,6 +8,3 @@ setup(
    entry_points={
       'console_scripts': [
          'webvuln_scanner = webvuln_scanner:main'
-      ]
-   }
-)
