@@ -1,76 +1,55 @@
-# webvuln_scanner 
+ Here is a sample README.md file I would create for the web vulnerability scanner code:
 
-WebVulnScanner is a Python vulnerability scanner utilizing Nikto.
+# Web Vulnerability Scanner
 
-## Installation
+This tool scans websites for common web vulnerabilities like XSS, SQLi, etc. 
 
-```bash
-git clone https://github.com/alen-sebastian/webvuln.git
-cd webvuln 
-sudo python setup.py install
-```
+## Features
 
-Or install via pip:
-
-```bash 
-pip install git+https://github.com/alen-sebastian/webvuln.git
-```
+- Crawls a target domain to find pages to test
+- Extracts URLs and parameters from the crawl 
+- Tests for SQL injection vulnerabilities by injecting payloads
+- Checks for reflected XSS in parameters
+- Can scan subdomains or a single domain
+- Output reports found vulnerabilities
 
 ## Usage
 
 ```
-webvuln_scanner [options] <url>
+# Crawl example.com
+python scanner.py -d example.com
+
+# Crawl subdomains of example.com 
+python scanner.py -d example.com -s True
+
+# Output results to file
+python scanner.py -d example.com -o results.txt  
 ```
 
-**Options:**
-
-`-o, --output <file>` - Output file for results (default: `results.txt`)
-
-`-f, --format <format>` - Output format: text, csv, json (default: text) 
-
-`-t, --threads <num>` - Number of threads (default: 5)
-
-## Example 
+## Installation
 
 ```
-webvuln_scanner -o results.csv -f csv https://example.com
+git clone https://github.com/user/scanner.git
+pip install -r requirements.txt
 ```
 
-Scans example.com and saves CSV results to results.csv.
+Requires Python 3 and the following libraries:
 
-## Output Formats
+- requests
+- BeautifulSoup
+- optparse
 
-### Text
+## Customizing
 
-Prints vulnerabilities with OSVDB IDs:
-
-```
-OSVDB-3092: /test/: Potentially interesting directory  
-OSVDB-3268: /icons/: Directory indexing found.
-```
-
-### CSV
-
-```
-OSVDB-3092,/test/: Potentially interesting directory
-OSVDB-3268,/icons/: Directory indexing found.  
-```
-
-### JSON 
-
-```json
-[
-  {
-    "id": "OSVDB-3092",
-    "description": "/test/: Potentially interesting directory"
-  },
-  {  
-    "id": "OSVDB-3268",
-    "description": "/icons/: Directory indexing found."
-  }
-]
-```
+The `payloads.txt` file contains the list of SQLi and XSS payloads to test. You can add or modify payloads to customize for your needs.
 
 ## Contributing
 
-Contributions welcome! Please create an issue or PR on GitHub. 
+Contributions to the scanner are welcome! Please open issues or PRs on Github.
+
+Potential areas of contribution:
+
+- Adding other vulnerability checks like LFI, RCE, etc
+- Expanding crawler functionality
+- Improving output reporting
+- Performance optimization
